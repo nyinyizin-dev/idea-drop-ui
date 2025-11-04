@@ -1,17 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import api from "@/libs/axios";
-import type { Idea } from "@/types";
-
-const fetchIdeas = async (): Promise<Idea[]> => {
-  const res = await api.get("/ideas");
-  return res.data;
-};
+import { fetchIdeas } from "@/api/ideas";
+import IdeaCard from "@/components/IdeaCard";
 
 const ideasQueryOptions = () =>
   queryOptions({
     queryKey: ["ideas"],
-    queryFn: () => fetchIdeas(),
+    queryFn: fetchIdeas,
   });
 
 export const Route = createFileRoute("/ideas/")({
@@ -22,30 +17,17 @@ export const Route = createFileRoute("/ideas/")({
 });
 
 function IdeaPage() {
-  const { data: ideas } = useSuspenseQuery(ideasQueryOptions());
-  console.log(ideas);
+  const { data } = useSuspenseQuery(ideasQueryOptions());
+  const ideas = [...data].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Ideas</h1>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {ideas.map((idea) => (
-          <li
-            className="border border-gray-300 p-4 rounded shadow bg-white flex flex-col justify-between"
-            key={idea.id}
-          >
-            <div>
-              <h2 className="text-lg font-semibold">{idea.title}</h2>
-              <p className="text-gray-700 mt-2">{idea.summary}</p>
-            </div>
-
-            <Link
-              to="/ideas/$ideaId"
-              params={{ ideaId: idea.id.toString() }}
-              className="text-center mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            >
-              View Idea
-            </Link>
-          </li>
+          <IdeaCard key={idea.id} idea={idea} />
         ))}
       </ul>
     </div>
