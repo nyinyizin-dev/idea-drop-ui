@@ -8,6 +8,7 @@ import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
+import { AuthProvider } from "./context/AuthContext.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +21,7 @@ const queryClient = new QueryClient({
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: {queryClient},
+  context: { queryClient },
   defaultPreload: "intent",
   scrollRestoration: true,
   defaultStructuralSharing: true,
@@ -39,11 +40,13 @@ const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <QueryClientProvider client={queryClient}>
-      <StrictMode>
-        <RouterProvider router={router} />
-      </StrictMode>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <StrictMode>
+          <RouterProvider router={router} />
+        </StrictMode>
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }
 
