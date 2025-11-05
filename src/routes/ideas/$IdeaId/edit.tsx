@@ -38,7 +38,7 @@ function IdeaEditPage() {
         description,
         tags: tagsInput
           .split(",")
-          .map((t) => t.trim())
+          .map((t:any) => t.trim())
           .filter(Boolean),
       }),
     onSuccess: () => {
